@@ -1,0 +1,22 @@
+server:
+  port: 8080
+  servlet:
+    context-path: "/api/v1"
+
+spring:
+  application:
+    name: usermanagementservice
+
+  datasource:
+    url: jdbc:mysql://localhost:3306/users_management
+    username: root
+    password: root
+  jpa:
+    hibernate:
+      ddl-auto: update
+
+security:
+  token:
+    type: Bearer
+    key: 123456
+    validity: 25920000000
