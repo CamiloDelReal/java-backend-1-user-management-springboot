@@ -8,14 +8,12 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-import org.xapps.services.usermanagementservice.dtos.LoginRequest;
-import org.xapps.services.usermanagementservice.dtos.LoginResponse;
-import org.xapps.services.usermanagementservice.dtos.UserRequest;
-import org.xapps.services.usermanagementservice.dtos.UserResponse;
+import org.xapps.services.usermanagementservice.dtos.*;
 import org.xapps.services.usermanagementservice.entities.User;
 import org.xapps.services.usermanagementservice.exceptions.DuplicityException;
 import org.xapps.services.usermanagementservice.exceptions.InvalidCredentials;
 import org.xapps.services.usermanagementservice.exceptions.NotFoundException;
+import org.xapps.services.usermanagementservice.services.RoleService;
 import org.xapps.services.usermanagementservice.services.UserService;
 
 import javax.validation.Valid;
@@ -26,10 +24,12 @@ import java.util.List;
 @Slf4j
 public class UserController {
     private final UserService userService;
+    private final RoleService roleService;
 
     @Autowired
-    public UserController(UserService userService) {
+    public UserController(UserService userService, RoleService roleService) {
         this.userService = userService;
+        this.roleService = roleService;
     }
 
     @PostMapping(path = "/login", consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
@@ -48,6 +48,17 @@ public class UserController {
         return response;
     }
 
+    @GetMapping(path = "/roles", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<RoleResponse>> getAllRoles() {
+        ResponseEntity<List<RoleResponse>> response = null;
+        try {
+            List<RoleResponse> roles = roleService.getAll();
+            response = new ResponseEntity<>(roles, HttpStatus.OK);
+        } catch (Exception ex) {
+            response = new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        return response;
+    }
     @GetMapping(produces = MediaType.APPLICATION_JSON_VALUE)
     @PreAuthorize("isAuthenticated() and hasAuthority('Administrator')")
     public ResponseEntity<List<UserResponse>> getAllUsers() {
